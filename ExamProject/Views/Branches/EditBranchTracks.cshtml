@@ -1,0 +1,36 @@
+﻿@using ExamProject.Models.DTOs.BranchDTOs
+@using ExamProject.Models.DTOs.TrackDTOs
+@model BranchTracksSelectListDTO
+
+@{
+    ViewBag.Title = "Edit Branch Tracks";
+    var tracks = ViewBag.Tracks as IEnumerable<TrackSelectListDTO>;
+    var notInBranchTracks = tracks.Where(t => !Model.Tracks.Contains(t)).ToList();
+    var notInBranchTrackList = new SelectList(notInBranchTracks, "TrackId", "TrackName");
+    var InBranchTrackList = new SelectList(Model.Tracks, "TrackId", "TrackName");
+    // var ToBeAdded = new List<TrackSelectListDTO>();
+    // var ToBeRemoved = new List<TrackSelectListDTO>();
+}
+<h2>Edit Branch Tracks</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Branch</label>
+        <label class="form-control">@Model.BranchName</label>
+    </div>
+    <input type="hidden" name="id" value="@Model.BranchId" />
+    @* Make a List Of Tracks in the branch And A list of tracks not in the Branch *@
+    <div class="mb-3">
+        <label class="form-label">Tracks To Add</label>
+        <select name="ToBeAdded" class="form-select" asp-items="notInBranchTrackList">
+            <option value="">-- Select Track --</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Tracks In Branch</label>
+        <select name="ToBeRemoved" class="form-select" asp-items="InBranchTrackList">
+            <option value="">-- Select Track --</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

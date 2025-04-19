@@ -1,0 +1,55 @@
+﻿@model ExamProject.Models.DTOs.StudentDTOs.GetStudentDTO
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<h2>Student Details</h2>
+
+<div class="card p-4 border shadow-sm mt-3">
+    <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Phone</dt>
+        <dd class="col-sm-9">@Model.Phone</dd>
+
+        <dt class="col-sm-3">Address</dt>
+        <dd class="col-sm-9">@Model.Address</dd>
+
+        <dt class="col-sm-3">Age</dt>
+        <dd class="col-sm-9">@Model.Age</dd>
+
+        <dt class="col-sm-3">Branch</dt>
+        <dd class="col-sm-9">
+            @if (Model.BranchId != null)
+            {
+                <a asp-action="Details" asp-controller="Branches" asp-route-id="@Model.BranchId">@Model.BranchName</a>
+            }
+            else
+            {
+                <span>No Branch Assigned</span>
+            }
+        </dd>
+
+        <dt class="col-sm-3">
+            @if (Model.TrackId != null)
+            {
+                <a asp-action="Details" asp-controller="Tracks" asp-route-id="@Model.TrackId">@Model.TrackName</a>
+            }
+            else
+            {
+                <span>No Track Assigned</span>
+            })
+        </dt>
+        <dd class="col-sm-9">@Model.TrackName</dd>
+    </dl>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

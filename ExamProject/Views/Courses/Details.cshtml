@@ -1,0 +1,59 @@
+﻿@using ExamProject.Models.DTOs.CoursesDTOs
+@model GetCourseDTO
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<h2>Student Details</h2>
+
+<div class="card p-4 border shadow-sm mt-3">
+    <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Duration</dt>
+        <dd class="col-sm-9">@Model.Duration</dd>
+
+        <dt class="col-sm-3">Topics</dt>
+        <dd class="col-sm-9">
+            @if (Model.Topics.Any())
+            {
+                foreach (var topic in Model.Topics)
+                {
+                    <a asp-action="Details" asp-controller="Topics" asp-route-id="@topic.Id">@topic.Name</a>
+                }
+            }
+            else
+            {
+                <span>No Topics Assigned</span>
+            }
+        </dd>
+        <dt class="col-sm-3">Assignments</dt>
+        <dd class="col-sm-9">
+            @if (Model.Assignments.Any())
+            {
+                foreach (var assignment in Model.Assignments)
+                {
+                    <a asp-action="Details" asp-controller="Instructors" asp-route-id="@assignment.InstructorId">@assignment.InstructorName</a>
+                    <a asp-action="Details" asp-controller="Branches" asp-route-id="@assignment.BranchId">@assignment.BranchName</a>
+                    <a asp-action="Details" asp-controller="Tracks" asp-route-id="@assignment.TrackId">@assignment.TrackName</a>
+                }
+            }
+            else
+            {
+                <span>No Assignments Assigned</span>
+            }
+        </dd>
+
+
+    </dl>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

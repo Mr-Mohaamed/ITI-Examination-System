@@ -1,0 +1,34 @@
+﻿@using ExamProject.Models.DTOs.CoursesDTOs
+@using ExamProject.Models.DTOs.TopicDTOs
+@model CourseTopicsSelectListDTO
+
+@{
+    ViewBag.Title = "Edit Course Topics";
+    var topics = ViewBag.Topics as IEnumerable<TopicSelectListDTO>;
+    var notInCourseTopics = topics.Where(t => !Model.Topics.Contains(t)).ToList();
+    var notInCourseTopicList = new SelectList(notInCourseTopics, "TopicId", "TopicName");
+    var InCourseTopicList = new SelectList(Model.Topics, "TopicId", "TopicName");
+}
+<h2>Edit Course Topics</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Course</label>
+        <label class="form-control">@Model.CourseName</label>
+    </div>
+    <input type="hidden" name="id" value="@Model.CourseId" />
+    @* Make a List Of Topics in the branch And A list of topics not in the Course *@
+    <div class="mb-3">
+        <label class="form-label">Topics To Add</label>
+        <select name="ToBeAdded" class="form-select" asp-items="notInCourseTopicList">
+            <option value="">-- Select Topic --</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Topics In Course</label>
+        <select name="ToBeRemoved" class="form-select" asp-items="InCourseTopicList">
+            <option value="">-- Select Topic --</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

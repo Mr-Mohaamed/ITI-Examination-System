@@ -1,0 +1,42 @@
+﻿@using ExamProject.Models.DTOs.StudentDTOs
+@model IEnumerable<IndexStudentDTO>
+
+@{
+    ViewBag.Title = "Students";
+}
+
+<h2 class="mb-4">All Students</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add New Student</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Branch</th>
+            <th>Track</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.Name</td>
+                <td>
+                    <a asp-controller="Branches" asp-action="Details" asp-route-id="@student.BranchId">@student.BranchName</a>
+                </td>
+                <td>
+                    <a asp-controller="Tracks" asp-action="Details" asp-route-id="@student.TrackId">@student.TrackName</a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@student.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

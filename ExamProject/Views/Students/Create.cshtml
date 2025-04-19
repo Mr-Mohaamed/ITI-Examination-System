@@ -1,0 +1,87 @@
+﻿@using ExamProject.Models.DTOs.BranchDTOs
+@model ExamProject.Models.DTOs.StudentDTOs.CreateStudentDTO
+
+@{
+    ViewBag.Title = "Create Student";
+    var branches = ViewBag.Branches as IEnumerable<BranchTracksSelectListDTO>;
+    var BranchList = new SelectList(branches, "BranchId", "BranchName");
+}
+
+<h2>Create Student</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+
+
+    <div class="mb-3">
+        <label asp-for="BranchId" class="form-label">Branch</label>
+        <select asp-for="BranchId" class="form-select" asp-items="BranchList">
+            <option value="">-- Select Branch --</option>
+        </select>
+        <span asp-validation-for="BranchId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TrackId" class="form-label">Track</label>
+        <select asp-for="TrackId" class="form-select">
+            <option value="">-- Select Track --</option>
+        </select>
+        <span asp-validation-for="TrackId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create</button>
+    <a asp-action="GetAll" class="btn btn-secondary">Cancel</a>
+</form>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#BranchId').change(function () {
+                var branchId = $(this).val();
+                var branchList = @Html.Raw(Json.Serialize(branches));
+                var trackSelect = $('#TrackId');
+                trackSelect.empty();
+
+                console.log(branchId, branchList);
+                trackSelect.append('<option value="">-- Select Track --</option>');
+                if (branchId) {
+                    var selectedBranch = branchList.find(b => b.branchId == branchId);
+                      console.log(selectedBranch.tracks);
+                    if (selectedBranch && selectedBranch.tracks) {
+                        $.each(selectedBranch.tracks, function (index, track) {
+                            trackSelect.append('<option value="' + track.trackId + '">' + track.trackName + '</option>');
+                        });
+                    }
+                }
+
+            });
+        });
+    </script>
+}

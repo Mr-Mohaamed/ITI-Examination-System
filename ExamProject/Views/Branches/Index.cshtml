@@ -1,0 +1,35 @@
+﻿@using ExamProject.Models.DTOs.BranchDTOs
+@model IEnumerable<IndexBranchDTO>
+
+@{
+    ViewBag.Title = "Branches";
+}
+
+<h2 class="mb-4">All Branches</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add New Branch</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var branch in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@branch.Id">@branch.Name</a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@branch.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@branch.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

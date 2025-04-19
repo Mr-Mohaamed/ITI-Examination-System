@@ -1,0 +1,57 @@
+﻿@using ExamProject.Models.DTOs.BranchDTOs
+@model BranchInfoDTO
+
+@{
+    ViewData["Title"] = "Student Details";
+}
+
+<h2>Student Details</h2>
+
+<div class="card p-4 border shadow-sm mt-3">
+    <dl class="row">
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3">Tracks</dt>
+        <dd class="col-sm-9">
+            @if (Model.Tracks.Any())
+            {
+                foreach (var track in Model.Tracks)
+                {
+                    <a asp-action="Details" asp-controller="Tracks" asp-route-id="@track.Id">@track.Name</a>
+                    if (track.StudentsCount > 0)
+                    {
+                        <span> - </span>
+                        <span>@track.StudentsCount students</span>
+                        foreach (var student in track.Students)
+                        {
+                            <div class="card mb-3 p-3 border">
+                                <h4><a asp-action="Details" asp-controller="Students" asp-route-id="@student.Id">@student.Name</a></h4>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span> - </span>
+                        <span>No students enrolled.</span>
+                    }
+                    
+                }
+            }
+            else
+            {
+                <span>No Track Assigned</span>
+            }
+        </dd>
+
+
+    </dl>
+
+    <div class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
