@@ -1,5 +1,6 @@
 ﻿using ExamProject.Models.DTOs.BranchDTOs;
 using ExamProject.Models.DTOs.CoursesDTOs;
+using ExamProject.Models.DTOs.TrackDTOs;
 
 namespace ExamProject.Services.Interfaces
 {
@@ -18,6 +19,7 @@ namespace ExamProject.Services.Interfaces
         //helpers
         Task<IEnumerable<CourseTopicsSelectListDTO>> AllCoursesWithTopicsSelectList();
         Task<CourseTopicsSelectListDTO> CourseWithTopicsSelectList(int id); // SelectList
+        Task<IEnumerable<CourseSelectListDTO>> AllCoursesSelectList();
 
     }
 }

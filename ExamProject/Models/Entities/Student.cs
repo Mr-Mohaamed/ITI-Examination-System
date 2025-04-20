@@ -32,5 +32,6 @@
 
         // Student --- BranchTrack
         public BranchTrack BranchTrack { get; set; }
+        public ICollection<Exam> Exams { get; set; } = new List<Exam>();
     }
 }

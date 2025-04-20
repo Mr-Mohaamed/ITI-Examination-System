@@ -17,6 +17,10 @@ namespace ExamProject.Models.Data
         public DbSet<Topic> Topics { get; set; }
         public DbSet<CourseTopic> CoursesTopic { get; set; }
         public DbSet<Track> Tracks { get; set; }
+        public DbSet<Exam> Exams { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<ExamQuestion> ExamQuestions { get; set; }
+        public DbSet<Choice> Choices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,6 +104,19 @@ namespace ExamProject.Models.Data
                 entity.HasOne(e => e.Instructor)
                         .WithMany(t => t.CourseAssignments)
                         .HasForeignKey(e => e.InstructorId);
+            });
+            modelBuilder.Entity<ExamQuestion>(entity =>
+            {
+                entity.HasKey(e => new { e.ExamId, e.QuestionId });
+                entity.HasOne(e => e.Exam)
+                      .WithMany(e => e.ExamQuestions)
+                      .HasForeignKey(e => e.ExamId);
+                entity.HasOne(e => e.Question)
+                      .WithMany(q => q.ExamQuestions)
+                      .HasForeignKey(e => e.QuestionId);
+                entity.HasOne(e => e.StudentAnswer)
+                      .WithMany(c => c.ExamQuestions)
+                      .HasForeignKey(e => e.StudentAnswerId);
             });
         }
     }

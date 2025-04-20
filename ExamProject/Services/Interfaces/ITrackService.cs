@@ -12,5 +12,9 @@ namespace ExamProject.Services.Interfaces
         Task<bool> UpdateTrack(EditTrackDTO trackDto);
         Task<bool> DeleteTrack(int id);
         Task<IEnumerable<TrackSelectListDTO>> TracksSelectList();
+
+        Task<bool> UpdateTrackCourses(int id, List<int> ToBeAdded, List<int> ToBeRemoved);
+        Task<IEnumerable<TrackCoursesSelectListDTO>> AllTracksWithTopicsForSelectList();
+        Task<TrackCoursesSelectListDTO> TrackWithCoursesSelectList(int id);
     }
 }

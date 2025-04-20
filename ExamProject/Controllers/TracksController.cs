@@ -4,15 +4,18 @@ using ExamProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.WebRequestMethods;
 using System.Buffers.Text;
+using ExamProject.Models.DTOs.BranchDTOs;
 
 namespace ExamProject.Controllers
 {
     [Route("[controller]")]
     public class TracksController(
-            ITrackService TrackService
+            ITrackService TrackService,
+            ICourseService courseService
         ) : Controller
     {
         private readonly ITrackService _trackService = TrackService;
+        private readonly ICourseService _courseService = courseService;
 
         // GET: Track
         [HttpGet]
@@ -55,7 +58,7 @@ namespace ExamProject.Controllers
         }
 
         // GET: Track/Edit/5
-        [HttpGet("Edit/{id}")]
+        [HttpGet("{id}/Edit")]
         public async Task<ActionResult> Edit(int id)
         {
             var trackDTO = await _trackService.EditTrack(id);
@@ -65,7 +68,7 @@ namespace ExamProject.Controllers
             return View(trackDTO);
         }
         // Post: /Track/Edit/5
-        [HttpPost("Edit/{id}")]
+        [HttpPost("{id}/Edit")]
         //public async Task<ActionResult> Update(int id, [FromBody] EditTrackDTO dto)
         public async Task<ActionResult> Update(int id, EditTrackDTO dto)
         {
@@ -82,7 +85,7 @@ namespace ExamProject.Controllers
         }
 
         // DELETE: api/Track/5
-        [HttpPost("Delete/{id}")]
+        [HttpPost("{id}/Delete")]
         public async Task<ActionResult> Delete(int id)
         {
             try
@@ -97,6 +100,33 @@ namespace ExamProject.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
+        // New 
+
+        // GET: Track/5/Courses
+        [HttpGet("{id}/Courses")]
+        public async Task<ActionResult<TrackCoursesSelectListDTO>> EditTrackCourses(int id)
+        {
+            var courses = await _courseService.AllCoursesSelectList();
+            ViewBag.Courses = courses;
+            var track = await _trackService.TrackWithCoursesSelectList(id);
+            if (track == null)
+                return NotFound();
+
+            return View(track);
+        }
+
+        // Post: Track/5/Courses
+        [HttpPost("{id}/Courses")]
+        public async Task<ActionResult<TrackCoursesSelectListDTO>> UpdateTrackCourses(int id, List<int> ToBeAdded, List<int> ToBeRemoved)
+        {
+            if (ToBeAdded == null && ToBeRemoved == null)
+                return BadRequest("No tracks to add or remove");
+            var track = await _trackService.GetTrack(id);
+            if (track == null)
+                return NotFound();
+            await _trackService.UpdateTrackCourses(id, ToBeAdded, ToBeRemoved);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
 
@@ -106,6 +136,6 @@ namespace ExamProject.Controllers
 //GET    | /Tracks/{id}        | GetById(int id)  | Returns details view for a specific track by ID
 //GET    | /Tracks/Create      | Create()         | Returns the form view to create a track
 //POST   | /Tracks/Create      | Create(dto)      | Submits the create form (form-based post)
-//GET    | /Tracks/Edit/{id}   | Edit(int id)     | Returns the edit form view
-//POST   | /Tracks/Edit/{id}   | Update(id, dto)  | Submits the edit form with updates
-//POST   | /Tracks/Delete/{id} | Delete(id)       | Deletes a track(form or JS-based)
+//GET    | /Tracks/{id}/Edit   | Edit(int id)     | Returns the edit form view
+//POST   | /Tracks/{id}/Edit   | Update(id, dto)  | Submits the edit form with updates
+//POST   | /Tracks/{id}/Delete | Delete(id)       | Deletes a track(form or JS-based)

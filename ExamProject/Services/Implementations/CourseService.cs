@@ -1,5 +1,6 @@
 ﻿using ExamProject.Models.DTOs.BranchDTOs;
 using ExamProject.Models.DTOs.CoursesDTOs;
+using ExamProject.Models.DTOs.TrackDTOs;
 using ExamProject.Models.Entities;
 using ExamProject.Services.Interfaces;
 
@@ -180,6 +181,15 @@ namespace ExamProject.Services.Implementations
             };
             return courseDto;
         }
+        public async Task<IEnumerable<CourseSelectListDTO>> AllCoursesSelectList()
+        {
+            var courses = await _courseRepository.GetAllAsync();
+            return courses.Select(b => new CourseSelectListDTO
+            {
+                CourseId = b.Id,
+                CourseName = b.Name
+            });
 
+        }
     }
 }

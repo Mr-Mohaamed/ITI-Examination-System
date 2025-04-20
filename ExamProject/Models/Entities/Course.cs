@@ -12,5 +12,9 @@
         public ICollection<CourseTrack> CourseTracks { get; set; } = new List<CourseTrack>();
         // Course --- Topic
         public ICollection<CourseTopic> CourseTopics { get; set; } = new List<CourseTopic>();
+        // Course --- Exam
+        public ICollection<Exam> Exams { get; set; } = new List<Exam>();
+        // Course --- Questions
+        public ICollection<Question> Questions { get; set; } = new List<Question>();
     }
 }

@@ -31,3 +31,18 @@
         }
     </div>
 }
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Course Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model.Courses)
+        {
+            <tr>
+                <td><a asp-controller="courses" asp-action="Details" asp-route-id="@course.CourseId">@course.CourseName</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

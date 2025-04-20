@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using static System.Net.WebRequestMethods;
 using System.Buffers.Text;
 using ExamProject.Models.Entities;
+using ExamProject.Models.DTOs.TrackDTOs;
 
 namespace ExamProject.Controllers
 {
@@ -85,7 +86,7 @@ namespace ExamProject.Controllers
             if (result == null)
                 return NotFound("Branch not found");
 
-            return NoContent();
+            return RedirectToAction(nameof(Index));
         }
 
         // DELETE: Branch/5
@@ -107,7 +108,7 @@ namespace ExamProject.Controllers
 
         // GET: Branch/5/Tracks
         [HttpGet("{id}/Tracks")]
-        public async Task<ActionResult<BranchTracksSelectListDTO>> EditBranchTracks(int id)
+        public async Task<ActionResult<TrackCoursesSelectListDTO>> EditBranchTracks(int id)
         {
             var tracks = await _trackService.TracksSelectList();
             ViewBag.Tracks = tracks;
@@ -120,7 +121,7 @@ namespace ExamProject.Controllers
 
         // Post: Branch/5/Tracks
         [HttpPost("{id}/Tracks")]
-        public async Task<ActionResult<BranchTracksSelectListDTO>> UpdateBranchTracks(int id, List<int> ToBeAdded, List<int> ToBeRemoved)
+        public async Task<ActionResult<TrackCoursesSelectListDTO>> UpdateBranchTracks(int id, List<int> ToBeAdded, List<int> ToBeRemoved)
         {
             if (ToBeAdded == null && ToBeRemoved == null)
                 return BadRequest("No tracks to add or remove");
