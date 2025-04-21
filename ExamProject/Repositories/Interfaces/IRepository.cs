@@ -6,6 +6,11 @@ public interface IRepository<T> where T : class
     // Index - Get all with optional includes
     Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
     Task<IEnumerable<T>> GetAllWithNestedIncludesAsync(params string[] includePaths);
+    Task<IEnumerable<T>> GetAllWithNestedIncludesAndFilterAsync
+        (
+            Expression<Func<T, bool>>? filter = null,
+            params string[] includePaths
+        );
 
     // Details - Get single by ID with optional includes
     Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes);

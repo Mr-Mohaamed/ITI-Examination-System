@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamProject.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250414201058_M1")]
+    [Migration("20250420131213_M1")]
     partial class M1
     {
         /// <inheritdoc />
@@ -58,6 +58,31 @@ namespace ExamProject.Migrations
                     b.HasIndex("TrackId");
 
                     b.ToTable("BranchTracks");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Choice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Choices");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.Course", b =>
@@ -145,6 +170,58 @@ namespace ExamProject.Migrations
                     b.ToTable("CourseTracks");
                 });
 
+            modelBuilder.Entity("ExamProject.Models.Entities.Exam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentResult")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Exams");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.ExamQuestion", b =>
+                {
+                    b.Property<int>("ExamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentAnswerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExamId", "QuestionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("StudentAnswerId");
+
+                    b.ToTable("ExamQuestions");
+                });
+
             modelBuilder.Entity("ExamProject.Models.Entities.Instructor", b =>
                 {
                     b.Property<int>("Id")
@@ -172,6 +249,34 @@ namespace ExamProject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Instructors");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.Student", b =>
@@ -222,9 +327,6 @@ namespace ExamProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -234,8 +336,6 @@ namespace ExamProject.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
 
                     b.ToTable("Topics");
                 });
@@ -281,6 +381,17 @@ namespace ExamProject.Migrations
                     b.Navigation("Branch");
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Choice", b =>
+                {
+                    b.HasOne("ExamProject.Models.Entities.Question", "Question")
+                        .WithMany("Choices")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.CourseAssignment", b =>
@@ -348,6 +459,63 @@ namespace ExamProject.Migrations
                     b.Navigation("Track");
                 });
 
+            modelBuilder.Entity("ExamProject.Models.Entities.Exam", b =>
+                {
+                    b.HasOne("ExamProject.Models.Entities.Course", "Course")
+                        .WithMany("Exams")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ExamProject.Models.Entities.Student", "Student")
+                        .WithMany("Exams")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.ExamQuestion", b =>
+                {
+                    b.HasOne("ExamProject.Models.Entities.Exam", "Exam")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ExamProject.Models.Entities.Question", "Question")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ExamProject.Models.Entities.Choice", "StudentAnswer")
+                        .WithMany("ExamQuestions")
+                        .HasForeignKey("StudentAnswerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Exam");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("StudentAnswer");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Question", b =>
+                {
+                    b.HasOne("ExamProject.Models.Entities.Course", "Course")
+                        .WithMany("Questions")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("ExamProject.Models.Entities.Student", b =>
                 {
                     b.HasOne("ExamProject.Models.Entities.BranchTrack", "BranchTrack")
@@ -357,17 +525,6 @@ namespace ExamProject.Migrations
                         .IsRequired();
 
                     b.Navigation("BranchTrack");
-                });
-
-            modelBuilder.Entity("ExamProject.Models.Entities.Topic", b =>
-                {
-                    b.HasOne("ExamProject.Models.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.Branch", b =>
@@ -382,11 +539,20 @@ namespace ExamProject.Migrations
                     b.Navigation("Students");
                 });
 
+            modelBuilder.Entity("ExamProject.Models.Entities.Choice", b =>
+                {
+                    b.Navigation("ExamQuestions");
+                });
+
             modelBuilder.Entity("ExamProject.Models.Entities.Course", b =>
                 {
                     b.Navigation("CourseTopics");
 
                     b.Navigation("CourseTracks");
+
+                    b.Navigation("Exams");
+
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.CourseTrack", b =>
@@ -394,9 +560,26 @@ namespace ExamProject.Migrations
                     b.Navigation("CourseAssignments");
                 });
 
+            modelBuilder.Entity("ExamProject.Models.Entities.Exam", b =>
+                {
+                    b.Navigation("ExamQuestions");
+                });
+
             modelBuilder.Entity("ExamProject.Models.Entities.Instructor", b =>
                 {
                     b.Navigation("CourseAssignments");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Question", b =>
+                {
+                    b.Navigation("Choices");
+
+                    b.Navigation("ExamQuestions");
+                });
+
+            modelBuilder.Entity("ExamProject.Models.Entities.Student", b =>
+                {
+                    b.Navigation("Exams");
                 });
 
             modelBuilder.Entity("ExamProject.Models.Entities.Topic", b =>

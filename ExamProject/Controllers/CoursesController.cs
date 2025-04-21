@@ -64,7 +64,7 @@ namespace ExamProject.Controllers
         }
         // Post: /Course/Edit/5
         [HttpPost("Edit/{id}")]
-        public async Task<ActionResult> Edit(int id, EditCourseDTO dto) 
+        public async Task<ActionResult> Edit(int id, EditCourseDTO dto)
         {
             if (dto == null)
             {
@@ -114,6 +114,40 @@ namespace ExamProject.Controllers
                 return NotFound();
             await _courseService.UpdateCourseTopics(id, ToBeAdded, ToBeRemoved);
             return RedirectToAction(nameof(Index));
+        }
+        // Questions
+        // GET: Course/5/Questions
+        [HttpGet("{id}/Questions")]
+        public async Task<ActionResult<GetCourseWithQuestionsDTO>> GetCourseQuestions(int id)
+        {
+            var course = await _courseService.GetCourseWithQuestions(id);
+            if (course == null)
+                return NotFound();
+            return View(course);
+        }
+
+        // GET: Course/5/Questions/Edit
+        [HttpGet("{id}/Questions/Create")]
+        public async Task<ActionResult> CreateCourseQuestion(int id)
+        {
+            var course = await _courseService.GetCourseSelectList(id);
+            if (course == null)
+                return NotFound();
+            ViewData["Course"] = course;
+            return View();
+        }
+        // POST: Course/5/Questions/Create
+        [HttpPost("{id}/Questions/Create")]
+        public async Task<ActionResult> CreateCourseQuestion(int id, CourseQuestionChoicesDTO dto)
+        {
+            if (dto == null)
+                return View();
+            if (ModelState.IsValid) 
+            {
+                var result = await _courseService.CreateCourseQuestion(dto);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(dto);
         }
     }
 }

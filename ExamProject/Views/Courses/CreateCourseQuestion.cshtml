@@ -1,0 +1,120 @@
+﻿@using ExamProject.Models.DTOs.CoursesDTOs
+@using ExamProject.Models.DTOs.TrackDTOs
+@using ExamProject.Models.Entities
+@model CourseQuestionChoicesDTO
+
+@{
+    ViewData["Title"] = "Create Question";
+    var course = ViewBag.Course as CourseSelectListDTO;
+}
+
+<h2>Create Question</h2>
+
+<form asp-action="CreateCourseQuestion" method="post">
+    <div class="form-group">
+        <label asp-for="CourseId" class="control-label"></label>
+        <input asp-for="CourseId" class="form-control" value="@course.CourseId" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CourseName" class="control-label"></label>
+        <input asp-for="CourseName" class="form-control" value="@course.CourseName" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuestionText" class="control-label"></label>
+        <textarea asp-for="QuestionText" class="form-control"></textarea>
+        <span asp-validation-for="QuestionText" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Points" class="control-label"></label>
+        <input asp-for="Points" class="form-control" type="number" min="1" />
+        <span asp-validation-for="Points" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="QuestionType" class="control-label"></label>
+        <select asp-for="QuestionType" class="form-control" id="questionTypeSelect">
+            <option value="@QuestionType.MCQ">Multiple Choice (MCQ)</option>
+            <option value="@QuestionType.TrueFalse">True/False</option>
+        </select>
+        <span asp-validation-for="QuestionType" class="text-danger"></span>
+    </div>
+
+    <div id="choicesContainer">
+        <!-- Choices will be dynamically added here -->
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create Question</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initial setup
+            updateChoicesFields();
+
+            // Update when question type changes
+            $('#questionTypeSelect').change(updateChoicesFields);
+
+            function updateChoicesFields() {
+                const questionType = $('#questionTypeSelect').val();
+                const container = $('#choicesContainer');
+                container.empty();
+
+                if (questionType === '@QuestionType.MCQ') {
+                    // Add 3 choice fields for MCQ
+                    for (let i = 0; i < 3; i++) {
+                        container.append(createChoiceField(i, false, "", "radio"));
+                    }
+                } else if (questionType === '@QuestionType.TrueFalse') {
+                    // Add 2 choice fields for True/False
+                    container.append(createChoiceField(0, true, "True", "radio"));
+                    container.append(createChoiceField(1, true, "False", "radio"));
+                }
+            }
+
+        function createChoiceField(index, isReadonly = false, text = '', inputType = "radio") {
+            const choiceName = `Choices[${index}]`;
+
+            return `
+                <div class="choice-group" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label class="control-label">Choice ${index + 1}</label>
+                        <input name="${choiceName}.Text" class="form-control"
+                                value="${text}" ${isReadonly ? 'readonly' : ''} />
+                        <span class="text-danger" data-valmsg-for="${choiceName}.Text"></span>
+                    </div>
+                    <div class="form-check">
+                        <input type="${inputType}" name="correctChoice"
+                                class="form-check-input correct-choice"
+                                value="${index}"
+                                data-choice-index="${index}" />
+                        <label class="form-check-label">Correct Answer</label>
+                        <input type="hidden" name="${choiceName}.IsCorrect" value="false" />
+                    </div>
+                </div>
+            `;
+        }
+
+
+            // Handle correct answer selection
+            $(document).on('change', '.correct-choice', function() {
+                const selectedIndex = $(this).val();
+                const questionType = $('#questionTypeSelect').val();
+
+                // Update all hidden IsCorrect fields
+                $('input[name^="Choices_"][name$="IsCorrect"]').val('false');
+                $(`input[name="Choices[${selectedIndex}].IsCorrect"]`).val('true');
+
+
+                // For visual feedback
+                $('.correct-choice').prop('checked', false);
+                $(this).prop('checked', true);
+            });
+        });
+    </script>
+}

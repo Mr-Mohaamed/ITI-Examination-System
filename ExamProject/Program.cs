@@ -23,6 +23,8 @@ builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<ITrackService, TrackService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+
 
 var app = builder.Build();
 

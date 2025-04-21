@@ -12,6 +12,11 @@ namespace ExamProject.Services.Interfaces
         Task<EditCourseDTO> EditCourse(int id);
         Task<bool> UpdateCourse(EditCourseDTO topicDto);
         Task<bool> DeleteCourse(int id);
+        // Course with Questions
+        Task<GetCourseWithQuestionsDTO> GetCourseWithQuestions(int id);
+        Task<CourseSelectListDTO> GetCourseSelectList(int id);
+        Task<bool> CreateCourseQuestion(CourseQuestionChoicesDTO dto);
+
 
         // Select List
         Task<bool> UpdateCourseTopics(int id, List<int> ToBeAdded, List<int> ToBeRemoved);
@@ -21,5 +26,6 @@ namespace ExamProject.Services.Interfaces
         Task<CourseTopicsSelectListDTO> CourseWithTopicsSelectList(int id); // SelectList
         Task<IEnumerable<CourseSelectListDTO>> AllCoursesSelectList();
 
+        
     }
 }

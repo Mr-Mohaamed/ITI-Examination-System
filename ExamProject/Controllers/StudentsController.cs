@@ -1,9 +1,6 @@
 ﻿using ExamProject.Models.DTOs.StudentDTOs;
-using ExamProject.Services.Implementations;
 using ExamProject.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using static System.Net.WebRequestMethods;
-using System.Buffers.Text;
 
 namespace ExamProject.Controllers
 {
@@ -11,11 +8,14 @@ namespace ExamProject.Controllers
     public class StudentsController(
             IStudentService studentService,
             IBranchService branchService,
-            ITrackService TrackService
+            ITrackService TrackService,
+            IExamService examService
         ) : Controller
     {
         private readonly IStudentService _studentService = studentService;
         private readonly IBranchService _branchService = branchService;
+        private readonly ITrackService _trackService = TrackService;
+        private readonly IExamService _examService = examService;
 
         // GET: Student
         [HttpGet]
@@ -65,7 +65,7 @@ namespace ExamProject.Controllers
             var studentDTO = await _studentService.EditStudent(id);
             if (studentDTO == null)
                 return NotFound();
-            
+
             // Put Branches and tracks in the ViewBag for the dropdowns
             ViewBag.Branches = await _branchService.AllBranchesWithTrackForSelectList();
 
@@ -103,6 +103,39 @@ namespace ExamProject.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
+        }
+
+        // GET: Student/{id}/Exams/Create
+        [HttpGet("{id}/Exams/Create")]
+        public async Task<ActionResult> CreateExam(int id)
+        {
+            // student courses
+            var student = await _studentService.GetStudentWithCourses(id);
+            if (student == null)
+                return NotFound();
+            return View(student);
+        }
+
+        // GET: Student/{id}/Exams
+        [HttpGet("{id}/Exams")]
+        public async Task<ActionResult> GetExams(int id)
+        {
+            var student = await _studentService.GetStudentWithExams(id);
+            if (student == null)
+                return NotFound();
+            return View(student);
+        }
+
+        // Post: Student/{id}/Exams/Create
+        [HttpPost("{id}/Exams/Create")]
+        public async Task<ActionResult> CreateExam(int studentId, int courseId)
+        {
+            // student courses
+            var student = await _studentService.GetStudentSelectListAsync(studentId);
+            if (student == null)
+                return NotFound();
+            var result = await _examService.GenerateExam(studentId, courseId);
+            return RedirectToAction(nameof(GetExams), new {id = studentId});
         }
     }
 }

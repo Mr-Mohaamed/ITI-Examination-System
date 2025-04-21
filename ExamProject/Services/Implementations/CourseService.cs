@@ -191,5 +191,77 @@ namespace ExamProject.Services.Implementations
             });
 
         }
+
+        // Course with Questions
+        public async Task<GetCourseWithQuestionsDTO> GetCourseWithQuestions(int id)
+        {
+            var course = await _courseRepository.GetByIdAsync(id,c=>c.Questions);
+            var courseDTO = new GetCourseWithQuestionsDTO
+            {
+                CourseId = course.Id,
+                CourseName = course.Name,
+                Questions = course.Questions.Select(q => new GetQuestionDTO
+                {
+                    QuestionId = q.Id,
+                    QuestionText = q.Text,
+                }).ToList()
+            };
+            return courseDTO;
+        }
+
+        //Get Course Id & Name
+        public async Task<CourseSelectListDTO> GetCourseSelectList(int id)
+        {
+            var course = await _courseRepository.GetByIdAsync(id);
+            if (course == null)
+                return null;
+            var courseDto = new CourseSelectListDTO
+            {
+                CourseId = course.Id,
+                CourseName = course.Name
+            };
+            return courseDto;
+        }
+
+        public async Task<bool> CreateCourseQuestion(CourseQuestionChoicesDTO dto)
+        {
+            var course = await _courseRepository.GetByIdAsync(dto.CourseId, c => c.Questions);
+            if (course == null)
+                return false;
+            var question = new Question
+            {
+                Text = dto.QuestionText,
+                Points = dto.Points,
+                Type = dto.QuestionType,
+                Choices = dto.Choices.Select(c => new Choice
+                {
+                    Text = c.Text,
+                    IsCorrect = c.IsCorrect
+                }).ToList()
+            };
+            course.Questions.Add(question);
+            await _courseRepository.UpdateAsync(course);
+            return true;
+
+            
+        }
+
+        //public async Task<CourseQuestionsSelectListDTO> CreateCourseQuestion(int id)
+        //{
+        //    var course = await _courseRepository.GetByIdAsync(id, c => c.Questions);
+        //    if (course == null)
+        //        return null;
+        //    var courseDto = new CourseQuestionsSelectListDTO
+        //    {
+        //        CourseId = course.Id,
+        //        CourseName = course.Name,
+        //        Questions = course.Questions.Select(q => new QuestionSelectListDTO
+        //        {
+        //            QuestionId = q.Id,
+        //            QuestionText = q.Text,
+        //        }).ToList()
+        //    };
+        //    return courseDto;
+        //}
     }
 }

@@ -1,0 +1,42 @@
+﻿@using ExamProject.Models.DTOs.StudentDTOs
+@using ExamProject.Models.Entities
+@model StudentExamsDTO
+@{
+    ViewData["Title"] = "Student Exams";
+}
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Exam ID</th>
+            <th>Course Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var exam in Model.Exams)
+        {
+            <tr>
+                <td>@exam.ExamId</td>
+                <td>@exam.CourseName</td>
+                <td>
+                    @* Passed, *@
+                    @* Failed, *@
+                    @* InProgress, *@
+                    @* NotStarted *@
+                    @if (exam.ExamStatus == ExamStatus.Passed || exam.ExamStatus == ExamStatus.Failed )
+                    {
+                        <a asp-controller="Exams" asp-action="Details" asp-route-id="@exam.ExamId">View</a>
+                    }
+                    else if (exam.ExamStatus == ExamStatus.InProgress)
+                    {
+                        <a asp-controller="Exams" asp-action="Details" asp-route-id="@exam.ExamId">Continue</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Exams" asp-action="Details" asp-route-id="@exam.ExamId">Start Exam</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

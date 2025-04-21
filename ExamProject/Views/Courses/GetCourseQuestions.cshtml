@@ -1,0 +1,27 @@
+﻿@using ExamProject.Models.DTOs.CoursesDTOs
+@model GetCourseWithQuestionsDTO
+@{
+    ViewData["Title"] = "Course Questions";
+}
+
+<h1>Course Questions</h1>
+<div>
+    <h2>@Model.CourseName</h2>
+    <h3>Questions:</h3>
+    <ul>
+        @foreach (var question in Model.Questions)
+        {
+            <li>@question.QuestionText</li>
+        }
+    </ul>
+
+    <a asp-action="Index" asp-controller="Courses">Back to Courses</a>
+
+    <a asp-action="Create" asp-controller="Questions" asp-route-courseId="@Model.CourseId">Add Question</a>
+
+    <a asp-action="Edit" asp-controller="Courses" asp-route-id="@Model.CourseId">Edit Course</a>
+
+    <form asp-action="Delete" asp-controller="Courses" method="post">
+        <input type="hidden" name="id" value="@Model.CourseId" />
+        <button type="submit">Delete Course</button>
+    </form>

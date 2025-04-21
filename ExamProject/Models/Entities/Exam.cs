@@ -12,7 +12,8 @@
         public int Id { get; set; }
         public int StudentId { get; set; }
         public int CourseId { get; set; }
-        public int StudentResult { get; set; }
+        public int StudentPoints { get; set; }
+        public int TotalPoints { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public ExamStatus Status { get; set; } = ExamStatus.NotStarted;
 

@@ -1,11 +1,7 @@
 ﻿// Repositories/Repository.cs
 using ExamProject.Models.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 public class Repository<T> : IRepository<T> where T : class
 {
@@ -29,6 +25,28 @@ public class Repository<T> : IRepository<T> where T : class
 
         return await query.ToListAsync();
     }
+
+    public async Task<IEnumerable<T>> GetAllWithNestedIncludesAndFilterAsync
+        (
+            Expression<Func<T, bool>>? filter = null,
+            params string[] includePaths
+        )
+    {
+        IQueryable<T> query = _dbSet;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        foreach (var includePath in includePaths)
+        {
+            query = query.Include(includePath);
+        }
+
+        return await query.ToListAsync();
+    }
+
     public async Task<IEnumerable<T>> GetAllWithNestedIncludesAsync(params string[] includePaths)
     {
         IQueryable<T> query = _dbSet;

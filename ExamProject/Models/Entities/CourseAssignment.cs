@@ -2,7 +2,7 @@
 {
     public class CourseAssignment
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public int InstructorId { get; set; }
         public int BranchId { get; set; }
         public int TrackId { get; set; }

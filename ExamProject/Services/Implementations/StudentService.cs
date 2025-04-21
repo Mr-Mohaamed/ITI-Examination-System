@@ -1,4 +1,6 @@
-﻿using ExamProject.Models.DTOs.StudentDTOs;
+﻿using ExamProject.Models.DTOs.ExamDTOs;
+using ExamProject.Models.DTOs.StudentDTOs;
+using ExamProject.Models.DTOs.TrackDTOs;
 using ExamProject.Models.Entities;
 using ExamProject.Repositories.Interfaces;
 using ExamProject.Services.Interfaces;
@@ -125,5 +127,53 @@ namespace ExamProject.Services.Implementations
             }
             return true;
         }
+
+        public async Task<StudentCoursesDTO> GetStudentWithCourses(int id)
+        {
+            var student = await _studentRepository.GetByIdWithNestedIncludesAsync(id, "BranchTrack.Track.CourseTracks.Course");
+            if (student == null) return null;
+            var studentDTO = new StudentCoursesDTO
+            {
+                StudentId = student.Id,
+                StudentName = student.Name,
+                Courses = student.BranchTrack.Track.CourseTracks.Select(ct => new CourseSelectListDTO
+                {
+                    CourseId = ct.CourseId,
+                    CourseName = ct.Course.Name,
+                }).ToList()
+            };
+            return studentDTO;
+        }
+        public async Task<StudentSelectListDTO> GetStudentSelectListAsync(int id)
+        {
+            var student = await _studentRepository.GetByIdAsync(id);
+            if (student == null) return null;
+            var studentDTO = new StudentSelectListDTO
+            {
+                Id = student.Id,
+                Name = student.Name,
+            };
+            return studentDTO;
+
+        }
+        public async Task<StudentExamsDTO> GetStudentWithExams(int id)
+        {
+            var student = await _studentRepository.GetByIdWithNestedIncludesAsync(id, "Exams.Course");
+            if (student == null) return null;
+            var studentDTO = new StudentExamsDTO
+            {
+                StudentId = student.Id,
+                StudentName = student.Name,
+                Exams = student.Exams.Select(se => new ExamSelectListDTO
+                {
+                    ExamId = se.Id,
+                    CourseId = se.CourseId,
+                    CourseName = se.Course.Name,
+                    ExamStatus = se.Status
+                }).ToList()
+            };
+            return studentDTO;
+        }
+
     }
 }

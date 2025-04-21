@@ -10,6 +10,9 @@ namespace ExamProject.Services.Interfaces
         Task<EditStudentDTO> EditStudent(int id);
         Task<bool> UpdateStudent(EditStudentDTO branch);
         Task<bool> DeleteStudent(int id);
-    }
+        Task<StudentCoursesDTO> GetStudentWithCourses(int id);
+        Task<StudentSelectListDTO> GetStudentSelectListAsync(int id);
+        Task<StudentExamsDTO> GetStudentWithExams(int id);
 
+    }
 }

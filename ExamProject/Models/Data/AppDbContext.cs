@@ -108,15 +108,21 @@ namespace ExamProject.Models.Data
             modelBuilder.Entity<ExamQuestion>(entity =>
             {
                 entity.HasKey(e => new { e.ExamId, e.QuestionId });
+
                 entity.HasOne(e => e.Exam)
                       .WithMany(e => e.ExamQuestions)
-                      .HasForeignKey(e => e.ExamId);
+                      .HasForeignKey(e => e.ExamId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(e => e.Question)
                       .WithMany(q => q.ExamQuestions)
-                      .HasForeignKey(e => e.QuestionId);
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(e => e.StudentAnswer)
                       .WithMany(c => c.ExamQuestions)
-                      .HasForeignKey(e => e.StudentAnswerId);
+                      .HasForeignKey(e => e.StudentAnswerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
