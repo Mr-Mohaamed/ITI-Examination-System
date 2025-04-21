@@ -1,14 +1,39 @@
 ﻿@using ExamProject.Models.DTOs.ExamDTOs
+@using ExamProject.Models.Entities
 @model GetExamDTO
 
 @{
     ViewData["Title"] = "Exam Details";
+    var startTime = Model.StartTime;
+    var endTime = startTime.AddMinutes(1);
+    var currentTime = DateTime.Now;
+    var timeRemaining = endTime - currentTime;
+    var timeRemainingSeconds = timeRemaining.TotalSeconds;
+    if (timeRemainingSeconds < 0)
+    {
+        timeRemaining = TimeSpan.Zero;
+    }
+    else
+    {
+        timeRemaining = TimeSpan.FromSeconds(timeRemainingSeconds);
+    }
+    var timeRemainingString = string.Format("{0:D2}:{1:D2}:{2:D2}", timeRemaining.Hours, timeRemaining.Minutes, timeRemaining.Seconds);
+    var totalSecondsRemaining = (int)timeRemaining.TotalSeconds;
 }
 
 <h1>Exam Details</h1>
 
 <div>
     <h2>Exam Information</h2>
+    @if (Model.ExamStatus == ExamStatus.InProgress)
+    {
+        <div class="form-group">
+            <label>Time Remaining:</label>
+            <p id="countdown-timer">@timeRemainingString</p>
+            <input type="hidden" id="remainingSeconds" value="@totalSecondsRemaining" />
+        </div>
+    }
+
     <p><strong>Exam ID:</strong> @Model.ExamId</p>
     <p><strong>Course Name:</strong> @Model.CourseName</p>
     <p><strong>Student Name:</strong> @Model.StudentName</p>
@@ -20,6 +45,7 @@
 <form method="post" asp-action="SubmitAnswers">
     <!-- Adjust action as needed -->
     <input type="hidden" name="ExamId" value="@Model.ExamId" />
+    <input type="hidden" name="StudentId" value="@Model.StudentId" />
     <ul>
         @for (int i = 0; i < Model.Questions.Count; i++)
         {
@@ -30,15 +56,66 @@
                 @foreach (var choice in question.Choices)
                 {
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="Questions[@i].Answer" value="@choice.Id" id="choice-@choice.Id" />
+                        @if (Model.ExamStatus == ExamStatus.Failed || Model.ExamStatus == ExamStatus.Passed)
+                        {
+                            @if (question.StudentAnswer == choice.Id)
+                            {
+                                <input class="form-check-input" type="radio" name="Questions[@i].Answer" value="@choice.Id" id="choice-@choice.Id" disabled checked />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="radio" name="Questions[@i].Answer" value="@choice.Id" id="choice-@choice.Id" disabled />
+                            }
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="radio" name="Questions[@i].Answer" value="@choice.Id" id="choice-@choice.Id" />
+                        }
                         <label class="form-check-label" for="choice-@choice.Id">@choice.ChoiceText</label>
                     </div>
                 }
             </li>
         }
         <input type="hidden" name="ExamId" value="@Model.ExamId" />
-
     </ul>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
+    @if (Model.ExamStatus == ExamStatus.InProgress)
+    {
+        <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+    }
+    else
+    {
+        <a class="btn btn-secondary" asp-action="GetExams" asp-controller="Students" asp-route-id="@Model.StudentId">Back to Exams</a>
+    }
 </form>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const countdownElement = document.getElementById("countdown-timer");
+            const remainingInput = document.getElementById("remainingSeconds");
+            const submitButton = document.getElementById("submitButton");
+            let remainingSeconds = parseInt(remainingInput?.value || "0");
+
+            if (!isNaN(remainingSeconds) && remainingSeconds > 0) {
+                const interval = setInterval(() => {
+                    if (remainingSeconds <= 0) {
+                        clearInterval(interval);
+                        countdownElement.textContent = "00:00:00";
+                        submitButton?.click(); // Auto-submit
+                        return;
+                    }
+
+                    let hours = Math.floor(remainingSeconds / 3600);
+                    let minutes = Math.floor((remainingSeconds % 3600) / 60);
+                    let seconds = remainingSeconds % 60;
+
+                    countdownElement.textContent =
+                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    remainingSeconds--;
+                }, 1000);
+            }
+        });
+    </script>
+}

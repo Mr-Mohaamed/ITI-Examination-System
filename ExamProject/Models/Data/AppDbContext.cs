@@ -44,34 +44,90 @@ namespace ExamProject.Models.Data
             //          .WithMany(c => c.ExamQuestionAnswers)
             //          .HasForeignKey(e => e.StudentAnswerId);
             //});
+
+            modelBuilder.Entity<Branch>()
+                .HasMany(c => c.BranchTracks)
+                .WithOne(ct => ct.Branch)
+                .HasForeignKey(ct => ct.BranchId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Track>()
+                .HasMany(c => c.BranchTracks)
+                .WithOne(ct => ct.Track)
+                .HasForeignKey(ct => ct.TrackId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.BranchTrack)
+                .WithMany(bt => bt.Students)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<BranchTrack>(entity =>
             {
                 entity.HasKey(e => new { e.BranchId, e.TrackId });
 
+                entity.HasMany(bt => bt.Students)
+                      .WithOne(s => s.BranchTrack)
+                      .HasForeignKey(s => new { s.BranchId, s.TrackId })
+                      .OnDelete(DeleteBehavior.Cascade);
+
                 entity.HasOne(e => e.Branch)
                       .WithMany(b => b.BranchTracks)
-                      .HasForeignKey(e => e.BranchId);
+                      .HasForeignKey(e => e.BranchId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
 
                 entity.HasOne(e => e.Track)
                       .WithMany(t => t.BranchTracks)
-                      .HasForeignKey(e => e.TrackId);
+                      .HasForeignKey(e => e.TrackId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
 
                 entity.HasMany(e => e.Students)
                         .WithOne(s => s.BranchTrack)
                         .HasForeignKey(e => new { e.BranchId, e.TrackId });
+
             });
+
+            modelBuilder.Entity<Course>()
+                .HasMany(c => c.CourseTracks)
+                .WithOne(ct => ct.Course)
+                .HasForeignKey(ct => ct.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Track>()
+                .HasMany(c => c.CourseTracks)
+                .WithOne(ct => ct.Track)
+                .HasForeignKey(ct => ct.TrackId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<CourseTrack>(entity =>
             {
                 entity.HasKey(e => new { e.CourseId, e.TrackId });
 
                 entity.HasOne(e => e.Track)
                       .WithMany(t => t.CourseTracks)
-                      .HasForeignKey(e => e.TrackId);
+                      .HasForeignKey(e => e.TrackId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.Course)
                       .WithMany(t => t.CourseTracks)
-                      .HasForeignKey(e => e.CourseId);
+                      .HasForeignKey(e => e.CourseId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<Course>()
+                .HasMany(c => c.CourseTopics)
+                .WithOne(ct => ct.Course)
+                .HasForeignKey(ct => ct.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Topic>()
+               .HasMany(c => c.CourseTopics)
+               .WithOne(ct => ct.Topic)
+               .HasForeignKey(ct => ct.TopicId)
+               .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<CourseTopic>(entity =>
             {
                 entity.HasKey(e => new { e.TopicId, e.CourseId });
@@ -79,15 +135,15 @@ namespace ExamProject.Models.Data
                 entity.HasOne(e => e.Topic)
                       .WithMany(t => t.CourseTopics)
                       .HasForeignKey(e => e.TopicId)
-                      .OnDelete(DeleteBehavior.Restrict); // <== Prevent cascade
+                      //.OnDelete(DeleteBehavior.Restrict); // <== Prevent cascade
+                      .OnDelete(DeleteBehavior.Cascade); // <== Prevent cascade
 
 
                 entity.HasOne(e => e.Course)
                       .WithMany(t => t.CourseTopics)
                       .HasForeignKey(e => e.CourseId)
-                      .OnDelete(DeleteBehavior.Restrict); // <== Prevent cascade
-
-
+                      //.OnDelete(DeleteBehavior.Restrict); // <== Prevent cascade
+                      .OnDelete(DeleteBehavior.Cascade); // <== Prevent cascade
             });
             modelBuilder.Entity<CourseAssignment>(entity =>
             {
@@ -105,6 +161,25 @@ namespace ExamProject.Models.Data
                         .WithMany(t => t.CourseAssignments)
                         .HasForeignKey(e => e.InstructorId);
             });
+
+            modelBuilder.Entity<Exam>()
+               .HasMany(e => e.ExamQuestions)
+               .WithOne(eq => eq.Exam)
+               .HasForeignKey(eq => eq.ExamId)
+               .OnDelete(DeleteBehavior.Cascade); // ✅ Cascade delete Exam → ExamQuestions
+
+            modelBuilder.Entity<Student>()
+                .HasMany(s => s.Exams)
+                .WithOne(e => e.Student)
+                .HasForeignKey(e => e.StudentId)
+                .OnDelete(DeleteBehavior.Cascade); // ✅ Cascade delete Student → Exams
+
+            modelBuilder.Entity<Question>()
+                .HasMany(q => q.Choices)
+                .WithOne(c => c.Question)
+                .HasForeignKey(c => c.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ExamQuestion>(entity =>
             {
                 entity.HasKey(e => new { e.ExamId, e.QuestionId });
@@ -112,7 +187,8 @@ namespace ExamProject.Models.Data
                 entity.HasOne(e => e.Exam)
                       .WithMany(e => e.ExamQuestions)
                       .HasForeignKey(e => e.ExamId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
+                //.OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.Question)
                       .WithMany(q => q.ExamQuestions)
@@ -127,3 +203,6 @@ namespace ExamProject.Models.Data
         }
     }
 }
+
+//Student - Exam - Exam Questions
+//Course - courseTopics - Topic

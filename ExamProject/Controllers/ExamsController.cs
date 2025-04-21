@@ -36,7 +36,7 @@ namespace ExamProject.Controllers
 
 
             // Redirect to result page or confirmation
-            return RedirectToAction("Index", "Students");
+            return RedirectToAction("GetExams", "Students", new {id = model.StudentId});
         }
     }
 }

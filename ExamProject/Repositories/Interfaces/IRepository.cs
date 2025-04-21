@@ -26,6 +26,7 @@ public interface IRepository<T> where T : class
 
     // Delete
     Task DeleteAsync(int id);
+    Task DeleteWithNestedIncludesAsync(int id, params string[] includePaths);
 
     // Check if exists
     Task<bool> ExistsAsync(int id);

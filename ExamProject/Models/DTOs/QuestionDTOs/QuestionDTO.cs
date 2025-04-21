@@ -7,6 +7,7 @@ namespace ExamProject.Models.DTOs.QuestionDTOs
     {
         public int Id { get; set; }
         public string QuestionText { get; set; } = string.Empty;
+        public int StudentAnswer { get; set; }
         public QuestionType QuestionType { get; set; }
         public int QuestionPoints { get; set; }
         public IEnumerable<ChoiceDTO> Choices { get; set; } = new List<ChoiceDTO>();

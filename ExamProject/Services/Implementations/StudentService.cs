@@ -120,7 +120,7 @@ namespace ExamProject.Services.Implementations
         {
             try
             {
-                await _studentRepository.DeleteAsync(id);
+                await _studentRepository.DeleteWithNestedIncludesAsync(id, "Exams.ExamQuestions");
             }catch(Exception ex)
             {
                 return false;

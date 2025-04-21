@@ -133,6 +133,28 @@ public class Repository<T> : IRepository<T> where T : class
             await _context.SaveChangesAsync();
         }
     }
+    public async Task DeleteWithNestedIncludesAsync(int id, params string[] includePaths)
+    {
+        IQueryable<T> query = _dbSet;
+
+        foreach (var includePath in includePaths)
+        {
+            query = query.Include(includePath);
+        }
+        var entity = await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        if (entity != null)
+        {
+            try
+            {
+                _dbSet.Remove(entity);
+            }catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex);
+                throw;
+            }
+            await _context.SaveChangesAsync();
+        }
+    }
 
     public async Task<bool> ExistsAsync(int id)
     {

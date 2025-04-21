@@ -26,9 +26,16 @@ namespace ExamProject.Services.Implementations
         public async Task<GetExamDTO> GetExam(int id)
         {
             // Get the exam by ID
-            var exam = await _examRepository.GetByIdWithNestedIncludesAsync(id, ["ExamQuestions.Question.Choices", "Student","Course"]);
+            var exam = await _examRepository.GetByIdWithNestedIncludesAsync(id, ["ExamQuestions.Question.Choices", "Student", "Course"]);
             if (exam == null)
                 throw new Exception("Exam not found");
+            // Check Exam Status
+            if (exam.Status == ExamStatus.NotStarted)
+            {
+                exam.Status = ExamStatus.InProgress;
+                exam.Date = DateTime.Now;
+                await _examRepository.UpdateAsync(exam);
+            }
             // Get the student ID and course ID
             var studentId = exam.StudentId;
             var courseId = exam.CourseId;
@@ -43,6 +50,7 @@ namespace ExamProject.Services.Implementations
                 QuestionText = eq.Question.Text,
                 QuestionPoints = eq.Question.Points,
                 QuestionType = eq.Question.Type,
+                StudentAnswer = eq.StudentAnswerId ?? 0,
                 Choices = eq.Question.Choices.Select(c => new ChoiceDTO
                 {
                     Id = c.Id,
@@ -61,6 +69,7 @@ namespace ExamProject.Services.Implementations
                 ExamStatus = exam.Status,
                 CourseName = exam.Course.Name,
                 StudentName = exam.Student.Name,
+                StartTime = exam.Date,
                 Questions = questions
             };
             return examDTO;
@@ -68,7 +77,7 @@ namespace ExamProject.Services.Implementations
         public async Task<bool> SubmitExam(SubmitExamAnswersDTO model)
         {
             // Check if the exam exists
-            var exam = await _examRepository.GetByIdWithNestedIncludesAsync(model.ExamId, ["Course","ExamQuestions.Questions.Choices"]);
+            var exam = await _examRepository.GetByIdWithNestedIncludesAsync(model.ExamId, ["Course", "ExamQuestions.Question.Choices"]);
             if (exam == null)
                 throw new Exception("Exam not found");
             //Update ExamQuestions
@@ -97,6 +106,8 @@ namespace ExamProject.Services.Implementations
                 {
                     var questionPoints = question.Question.Points;
                     var studentAnswer = question.StudentAnswerId;
+                    if (studentAnswer == null)
+                        continue;
                     var correctAnswer = question.Question.Choices.FirstOrDefault(c => c.IsCorrect)?.Id;
                     if (studentAnswer == correctAnswer)
                     {
